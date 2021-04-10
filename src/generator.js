@@ -6,9 +6,9 @@ import { toMorseText } from './morse.js';
 import { getRandomWord } from './dict.js';
 
 // gaps between morse code words, characters, and beeps (seconds)
-wordDelay = 1
-charDelay = 0.45
-beepDelay = 0.075
+var wordDelay = 1
+var charDelay = 0.45
+var beepDelay = 0.075
 
 var initialized = false;
 var ctx = null;
@@ -68,8 +68,8 @@ function playMorseAudio(str) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     let time = 0;
 
-    for (i = 0; i < str.length; i++) {
-        c = str[i];
+    for (let i = 0; i < str.length; i++) {
+        let c = str[i];
         if (c === ' ') {
             time += charDelay;
             continue;
