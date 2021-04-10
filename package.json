@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@gear4s/random-words": "*"
+  }
+}
