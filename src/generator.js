@@ -39,7 +39,11 @@ playbutton.onclick = async () => {
 };
 
 // on stop button click, stop current word
-stopbutton.onclick = async () => await ctx.close();
+stopbutton.onclick = async () => {
+    if (ctx) {
+        await ctx.close().then(() => ctx = null);
+    }
+};
 
 
 /* * * * * audio * * * * */
@@ -65,7 +69,17 @@ function fetchBuffers(ctx) {
 
 // play audio of a morse code string
 async function playMorseAudio(str) {
-    await ctx.close();
+    if (ctx) {
+        await ctx.close().then(() => {
+            ctx = null;
+            createMorseBuffer(str);
+        });
+    } else {
+        createMorseBuffer(str);
+    }
+}
+
+function createMorseBuffer(str) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     let time = 0;
 
@@ -101,9 +115,15 @@ textbox.addEventListener('input', async () => {
 
     if (randWord == response) {
         textbox.value = "";
-        await ctx.close().then(async () => {
+        if (ctx) {
+            await ctx.close().then(async () => {
+                ctx = null;
+                generateWord();
+                await playMorseAudio(morseWord);
+            });
+        } else {
             generateWord();
             await playMorseAudio(morseWord);
-        });
+        } 
     }
 });
