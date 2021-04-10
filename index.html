@@ -15,9 +15,11 @@
 <hr>
 </header>
 
-<button id="button" type="button">play</button>
+<button id="playbutton" type="button">play</button>
+<button id="stopbutton" type="button">stop</button>
 
 <div id="container"></div>
+<input type="text" id="textbox">
 
 <!-- <script type="module" src="src/generator.js"></script> -->
 <script type="text/javascript">
@@ -89,39 +91,68 @@ wordDelay = 1
 charDelay = 0.45
 beepDelay = 0.075
 
-var button = document.getElementById("button");
+var playbutton = document.getElementById("playbutton");
+var stopbutton = document.getElementById("stopbutton");
 var container = document.getElementById("container");
 var ctx = null;
 var dot, dash;
+var randWord = null;
+var morseWord = null;
+var initialized = false;
 
-// on button click, play/stop current word
-button.onclick = async () => {
-    if (button.textContent == "play") {
-        button.textContent = "stop";
-
-        let randWord = getRandomWord();
-        let morseWord = toMorseText(randWord);
-        container.innerHTML = randWord + " = " + morseWord;
-
-        await playMorseAudio(morseWord);
-    } else {
-        button.textContent = "play";
-        await ctx.close();
+// on play button click, play/replay current word
+playbutton.onclick = async () => {
+    if (!initialized) {
+        await initAudio().then(() => {
+            initialized = true;
+            generateWord();
+            playMorseAudio(morseWord);
+        })
     }
-
+    else {
+        playMorseAudio(morseWord);
+    }
 };
 
-// play audio of a morse code string
-async function playMorseAudio(word) {
-	console.log(word)
+// on stop button click, stop current word
+stopbutton.onclick = async () => await ctx.close();
+
+
+// initialize audio
+async function initAudio() {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (!dot || !dash) {
-        [dot, dash] = await fetchBuffers(ctx);
-    }
+    [dot, dash] = await fetchBuffers(ctx);
+}
+
+// get audio files
+function fetchBuffers(ctx) {
+  return Promise.all(
+    [
+        'https://jingqiyang.github.io/morse/resources/dot.wav',
+        'https://jingqiyang.github.io/morse/resources/dash.wav'
+    ].map(url => fetch(url)
+        .then(r => r.arrayBuffer())
+        .then(buf => ctx.decodeAudioData(buf))
+    )
+  );
+}
+
+
+// generate new random word
+function generateWord() {
+    randWord = getRandomWord();
+    morseWord = toMorseText(randWord);
+    container.innerHTML = randWord + " = " + morseWord;
+}
+
+// play audio of a morse code string
+function playMorseAudio(str) {
+    console.log(str)
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
     let time = 0;
 
-    for (i = 0; i < word.length; i++) {
-        c = word[i];
+    for (i = 0; i < str.length; i++) {
+        c = str[i];
         if (c === ' ') {
             time += charDelay;
             continue;
@@ -135,18 +166,21 @@ async function playMorseAudio(word) {
     }
 }
 
-// get audio files
-function fetchBuffers(ctx) {
-  return Promise.all(
-    [
-      'https://jingqiyang.github.io/morse/resources/dot.wav',
-      'https://jingqiyang.github.io/morse/resources/dash.wav'
-    ].map(url => fetch(url)
-      .then(r => r.arrayBuffer())
-      .then(buf => ctx.decodeAudioData(buf))
-    )
-  );
-}
+
+var textbox = document.getElementById("textbox");
+
+// when text box input matches, genenerate new word
+textbox.addEventListener('input', async () => {
+    let response = textbox.value;
+
+    if (randWord == response) {
+        textbox.value = "";
+        await ctx.close().then(() => {
+            generateWord();
+            playMorseAudio(morseWord);
+        });
+    }
+});
 
 
 </script>
