@@ -27,19 +27,23 @@ var textbox = document.getElementById("textbox");
 // on play button click, play/replay current word
 playbutton.onclick = async () => {
     if (!initialized) {
-        await initAudio().then(() => {
+        await initAudio().then(async () => {
             initialized = true;
             generateWord();
-            playMorseAudio(morseWord);
+            await playMorseAudio(morseWord);
         })
     }
     else {
-        playMorseAudio(morseWord);
+        await playMorseAudio(morseWord);
     }
 };
 
 // on stop button click, stop current word
-stopbutton.onclick = async () => await ctx.close();
+stopbutton.onclick = async () => {
+    if (ctx) {
+        await ctx.close().then(() => ctx = null);
+    }
+};
 
 
 /* * * * * audio * * * * */
@@ -64,7 +68,18 @@ function fetchBuffers(ctx) {
 }
 
 // play audio of a morse code string
-function playMorseAudio(str) {
+async function playMorseAudio(str) {
+    if (ctx) {
+        await ctx.close().then(() => {
+            ctx = null;
+            createMorseBuffer(str);
+        });
+    } else {
+        createMorseBuffer(str);
+    }
+}
+
+function createMorseBuffer(str) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     let time = 0;
 
@@ -100,9 +115,15 @@ textbox.addEventListener('input', async () => {
 
     if (randWord == response) {
         textbox.value = "";
-        await ctx.close().then(() => {
+        if (ctx) {
+            await ctx.close().then(async () => {
+                ctx = null;
+                generateWord();
+                await playMorseAudio(morseWord);
+            });
+        } else {
             generateWord();
-            playMorseAudio(morseWord);
-        });
+            await playMorseAudio(morseWord);
+        } 
     }
 });
