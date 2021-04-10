@@ -51,31 +51,83 @@ function toMorseChar(char) {
     return morseDict[c];
 }
 
-// audio delay between dots and dashes within a word in morse code
-var charDelay = 0;
-var wordDelay = 500;
+
+/*
 
 var dotAudio = document.getElementById("dot_audio");
 var dashAudio = document.getElementById("dash_audio");
 
-// play morse code audio for a string
-export function toMorseAudio(word, isMorse=false) {
-    for (var i = 0; i < word.length; i++) {
-        var delay = i == 0 ? wordDelay : charDelay;
-        var morseChar = isMorse ? word[i] : toMorseChar(word[i]);
-        
-        for (d in morseChar) {
-            if (d == '.') {
-                playSingleSound(dotAudio)
-            } else {
-                playSingleSound(dashAudio)
-            }
-        }
+document.getElementById("button").onclick = function() {
+    if (this.textContent == "play") {
+        this.textContent = "stop";
+        dotAudio.muted = false;
+        dashAudio.muted = false;
+
+        var randWord = getRandomWord();
+        var morseWord = toMorseText(randWord);
+        var container = document.getElementById("container");
+        container.innerHTML = randWord + " = " + morseWord;
+        playMorseAudio(morseWord)
+    } else {
+        this.textContent = "play";
+
+        dashAudio.pause();
+        dashAudio.currentTime = 0;
+        dotAudio.pause();
+        dotAudio.currentTime = 0;
     }
 
+};
+
+// audio delay between dots and dashes within a word in morse code
+var charDelay = 500;
+var wordDelay = 10000;
+var delay = 0;
+
+var i = 0;
+var currWord = "";
+
+// play morse code audio for a morse code string
+function playMorseAudio(word) {
+    i = 0;
+    currWord = word;
+    playNextSound();
+
 }
 
+dotAudio.onended = playNextSound;
+dashAudio.onended = playNextSound;
+
 // play dot or dash audio sound
-function playSingleSound(audio, delay) {
-    setTimeout(() => audio.play(), delay);
+function playNextSound() {
+    if (i >= currWord.length) {
+        return;
+    }
+
+    c = currWord[i];
+    delay = 0;
+
+    if (c == ' ') {
+        i += 1;
+        if (i >= currWord.length) {
+            return;
+        }
+        c = currWord[i];
+        delay = charDelay;
+    }
+
+    if (c == '.') {
+        dotAudio.play();
+    } else {
+        dashAudio.play();
+    }
+    i += 1;
 }
+
+function playSound(audio) {
+    setTimeout(function() {
+        audio.play();
+    }, delay);
+}
+
+*/

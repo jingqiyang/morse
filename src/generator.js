@@ -7,7 +7,61 @@ function getRandomWord() {
     return words[Math.floor(Math.random() * words.length)];
 }
 
-var randWord = getRandomWord();
+var source = null;
 
-var container = document.getElementById("container");
-container.innerHTML = randWord + " = " + toMorseText(randWord);
+document.getElementById("button").onclick = async () => {
+    if (this.textContent == "play") {
+        this.textContent = "stop";
+
+        var randWord = getRandomWord();
+        var morseWord = toMorseText(randWord);
+        var container = document.getElementById("container");
+        container.innerHTML = randWord + " = " + morseWord;
+
+        await playMorseAudio(morseWord);
+    } else {
+        this.textContent = "play";
+        if (source != null) {
+            source.stop();
+        }
+    }
+
+};
+
+(async function playMorseAudio(word) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const [dot, dash] = await fetchBuffers(ctx);
+    let time = 0;
+
+    for (var i = 0; i < word.length; i++) {
+        c = word[i];
+        if (c === ' ') {
+            time += 0.5;
+            return;
+        }
+
+        // create an AudioBufferSourceNode
+        source = ctx.createBufferSource();
+        // assign the correct AudioBuffer to it
+        source.buffer = c === '-' ? long : short;
+        // connect to our output audio
+        source.connect(ctx.destination);
+        // schedule it to start at the end of previous one
+        source.start(ctx.currentTime + time);
+        // increment our timer with our sample's duration
+        time += source.buffer.duration;
+    }
+})().catch(console.error);
+
+
+function fetchBuffers(ctx) {
+  return Promise.all(
+    [
+      './resources/dot.wav',
+      './resources/dash.wav'
+    ].map(url => fetch(url)
+      .then(r => r.arrayBuffer())
+      .then(buf => ctx.decodeAudioData(buf))
+    )
+  );
+}
