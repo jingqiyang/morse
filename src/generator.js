@@ -42,7 +42,7 @@ async function playCurrWord() {
     if (!initialized) {
         await initAudio().then(async () => {
             initialized = true;
-            hint.innerHTML = "click to show/hide hint";
+            // hint.innerHTML = "click to show/hide hint";
             generateNext();
         })
     } else if (correct) {
@@ -50,7 +50,7 @@ async function playCurrWord() {
         textbox.value = "";
 
         hiddenHint = true;
-        hint.innerHTML = "click to show/hide hint";
+        // hint.innerHTML = "click to show/hide hint";
 
         // fade out success message
         setTimeout(function() {
@@ -71,17 +71,17 @@ async function playCurrWord() {
 }
 
 // show/hide hint
-window.onload = function() {
-    hint.onclick = function () {
-        if (hiddenHint) {
-            hiddenHint = false;
-            hint.innerHTML = morseWord;
-        } else {
-            hiddenHint = true;
-            hint.innerHTML = "click to show/hide hint";
-        }
-    };
-}
+// window.onload = function() {
+//     hint.onclick = function () {
+//         if (hiddenHint) {
+//             hiddenHint = false;
+//             hint.innerHTML = morseWord;
+//         } else {
+//             hiddenHint = true;
+//             hint.innerHTML = "click to show/hide hint";
+//         }
+//     };
+// }
 
 // on stop button click, stop current word
 stopbutton.onclick = async () => {
