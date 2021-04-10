@@ -65,7 +65,6 @@ function fetchBuffers(ctx) {
 
 // play audio of a morse code string
 function playMorseAudio(str) {
-    console.log(str)
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     let time = 0;
 
@@ -91,7 +90,8 @@ function playMorseAudio(str) {
 function generateWord() {
     randWord = getRandomWord();
     morseWord = toMorseText(randWord);
-    container.innerHTML = randWord + " = " + morseWord;
+    console.log(randWord + "\n" + morseWord);
+    // container.innerHTML = randWord + "\n" + morseWord;
 }
 
 // when text box input matches, genenerate new word
