@@ -41,17 +41,17 @@ hr {
 }
 
 h1 {
-    font-size: 24px;
+    font-size: 20px;
 }
 
 h3 {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 0px;
     padding-bottom: 0px;
 }
 
 p, li {
-    font-size: 18px;
+    font-size: 14px;
 }
 
 a {
@@ -105,6 +105,18 @@ p.clear {
     header {
         margin-left: -5px;
         margin-right: -5px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    p, li {
+        font-size: 14px;
     }
 
     /*#nav {
